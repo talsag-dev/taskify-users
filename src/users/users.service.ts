@@ -11,12 +11,13 @@ import { DRIZZLE } from '../drizzle/drizzle.module';
 import { DrizzleDb } from '../drizzle/drizzle';
 import { hashPassword } from '../utils/index';
 import { users } from '../drizzle/schema';
+import { UserResponseDto } from './dto/user.dto';
 
 @Injectable()
 export class UsersService {
   constructor(@Inject(DRIZZLE) private db: DrizzleDb) {}
 
-  async createUser(dto: CreateUserDto) {
+  async createUser(dto: CreateUserDto): Promise<UserResponseDto> {
     const existingUser = await this.db
       .select()
       .from(users)
@@ -39,7 +40,7 @@ export class UsersService {
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...safeUser } = created;
-    return safeUser;
+    return new UserResponseDto(safeUser);
   }
 
   async getUserByEmail(email: string) {
@@ -48,21 +49,22 @@ export class UsersService {
       .from(users)
       .where(eq(users.email, email));
 
-    return user || null;
+    return user || null; // can stay raw
   }
 
-  async getUserById(id: string) {
+  async getUserById(id: string): Promise<UserResponseDto> {
     const [user] = await this.db.select().from(users).where(eq(users.id, id));
 
     if (!user) {
       throw new NotFoundException('User not found');
     }
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...safeUser } = user;
-    return safeUser;
+    return new UserResponseDto(safeUser);
   }
 
-  async updateUser(id: string, dto: UpdateUserDto) {
+  async updateUser(id: string, dto: UpdateUserDto): Promise<UserResponseDto> {
     const updateFields: Partial<typeof users.$inferInsert> = {
       name: dto.name,
       email: dto.email,
@@ -81,12 +83,13 @@ export class UsersService {
     if (!updated) {
       throw new NotFoundException('User not found');
     }
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...safeUser } = updated;
-    return safeUser;
+    return new UserResponseDto(safeUser);
   }
 
-  async deleteUser(id: string) {
+  async deleteUser(id: string): Promise<UserResponseDto> {
     const [deleted] = await this.db
       .delete(users)
       .where(eq(users.id, id))
@@ -95,8 +98,9 @@ export class UsersService {
     if (!deleted) {
       throw new NotFoundException('User not found');
     }
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...safeUser } = deleted;
-    return safeUser;
+    return new UserResponseDto(safeUser);
   }
 }

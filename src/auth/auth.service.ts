@@ -62,7 +62,6 @@ export class AuthService {
       throw new UnauthorizedException('Invalid or expired refresh token');
     }
 
-    // Optional: rotate refresh token
     await this.db.delete(refreshTokens).where(eq(refreshTokens.token, token));
 
     return this.issueTokens(existing.userId);
