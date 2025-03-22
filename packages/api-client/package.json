@@ -1,0 +1,23 @@
+{
+  "name": "@tasky/api-client",
+  "version": "1.0.4",
+  "main": "dist/api/api.js",
+  "types": "dist/api/api.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "prepare": "npm run build",
+    "publish:patch": "npm version patch && npm publish --access public",
+    "publish:minor": "npm version minor && npm publish --access public",
+    "publish:major": "npm version major && npm publish --access public"
+  },
+  "devDependencies": {
+    "orval": "7.7.0",
+    "typescript": "5.7.2"
+  },
+  "dependencies": {
+    "axios": "1.8.4"
+  }
+}
